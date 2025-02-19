@@ -1,133 +1,88 @@
-<script setup>
-import { ref } from "vue";
+<template>
+  <div>
+      <h2>Calculadora Simples</h2>
 
-const current = ref(""); // Display da calculadora
+      <input type="number" v-model="numero1" placeholder="Digite o primeiro número">
+      <input type="number" v-model="numero2" placeholder="Digite o segundo número">
 
-// Adiciona números ao display
-const appendNumber = (number) => {
-  current.value += number;
-};
+      <select v-model="operacao">
+          <option value="+">Somar</option>
+          <option value="-">Subtrair</option>
+          <option value="*">Multiplicar</option>
+          <option value="/">Dividir</option>
+      </select>
 
-// Adiciona operadores ao display (substitui o último operador, se houver)
-const appendOperator = (operator) => {
-  // Permite adicionar o operador apenas se não houver operador no final e se não for um número (após o cálculo)
-  if (current.value === "" || /[+\-*/]$/.test(current.value)) return;
-  current.value += operator;
-};
+      <div v-if="resultado !== null">
+          <h3>Resultado: {{ resultado }}</h3>
+      </div>
+      <div v-else>
+          <h3>Digite números válidos!</h3>
+      </div>
+  </div>
+</template>
 
-// Limpa o display
-const clear = () => {
-  current.value = "";
-};
+<script>
+export default {
+  data() {
+      return {
+          numero1: '',
+          numero2: '',
+          operacao: '+',
+          resultado: null
+      };
+  },
+  methods: {
+      calcular() {
+          const num1 = parseFloat(this.numero1);
+          const num2 = parseFloat(this.numero2);
 
-// Remove o último caractere
-const deleteLast = () => {
-  current.value = current.value.slice(0, -1);
-};
+          if (isNaN(num1) || isNaN(num2)) {
+              this.resultado = null;
+              return;
+          }
 
-// Calcula o resultado
-const calculate = () => {
-  try {
-    current.value = eval(current.value) || "0"; // Calcula a expressão
-  } catch {
-    current.value = "Erro"; // Exibe erro no display
-    setTimeout(() => (current.value = ""), 2000); // Limpa o erro após 2 segundos
+          switch (this.operacao) {
+              case '+':
+                  this.resultado = num1 + num2;
+                  break;
+              case '-':
+                  this.resultado = num1 - num2;
+                  break;
+              case '*':
+                  this.resultado = num1 * num2;
+                  break;
+              case '/':
+                  this.resultado = num2 !== 0 ? num1 / num2 : 'Erro! Divisão por zero';
+                  break;
+          }
+      }
+  },
+  watch: {
+      numero1() {
+          this.calcular();
+      },
+      numero2() {
+          this.calcular();
+      },
+      operacao() {
+          this.calcular();
+      }
   }
 };
 </script>
 
-<template>
-  <div class="calculator-container">
-    <div class="calculator">
-      <!-- Display da calculadora -->
-      <div class="display">
-        <span>{{ current || "0" }}</span>
-      </div>
-      <div class="buttons">
-        <!-- Botões da calculadora -->
-        <button @click="clear">C</button>
-        <button @click="deleteLast">⌫</button>
-        <button @click="appendOperator('/')">÷</button>
-        <button @click="appendOperator('*')">×</button>
-
-        <button @click="appendNumber('7')">7</button>
-        <button @click="appendNumber('8')">8</button>
-        <button @click="appendNumber('9')">9</button>
-        <button @click="appendOperator('-')">-</button>
-
-        <button @click="appendNumber('4')">4</button>
-        <button @click="appendNumber('5')">5</button>
-        <button @click="appendNumber('6')">6</button>
-        <button @click="appendOperator('+')">+</button>
-
-        <button @click="appendNumber('1')">1</button>
-        <button @click="appendNumber('2')">2</button>
-        <button @click="appendNumber('3')">3</button>
-        <button @click="calculate">=</button>
-
-        <button class="zero" @click="appendNumber('0')">0</button>
-        <button @click="appendNumber('.')">.</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style>
-/* Centraliza a calculadora */
-.calculator-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+body {
+  font-family: Arial, sans-serif;
+  max-width: 300px;
+  margin: 20px auto;
 }
-
-/* Estilização da calculadora */
-.calculator {
-  background: #2d3748;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-  width: 320px;
+input, select {
+  width: 100%;
+  padding: 5px;
+  margin: 5px 0;
 }
-
-/* Estilo do display */
-.display {
-  background: #1a202c;
-  color: #f8fafc;
-  font-size: 2rem;
-  text-align: right;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-/* Botões */
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-button {
-  background: #4a5568;
-  color: #f8fafc;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 10px;
-  padding: 15px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #2c5282;
-}
-
-.zero {
-  grid-column: span 2;
+div {
+  margin: 10px 0;
 }
 </style>
